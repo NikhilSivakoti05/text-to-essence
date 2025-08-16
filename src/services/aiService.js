@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-const API_URL = "https://proxyserver-r7js.onrender.com/proxy";
- // Call your proxy, not OpenRouter
-=======
-const API_URL = "http://localhost:5000/proxy"; // Call your proxy, not OpenRouter
->>>>>>> 98d024b7b03d022a5cc3a9fdb1df27a4ab4b948f
+const API_URL = "https://proxyserver-r7js.onrender.com/proxy"; 
+// Use deployed proxy, not localhost
 
 export const generateSummary = async (text, prompt) => {
   try {
