@@ -44,7 +44,6 @@ const EmailShare = ({ isOpen, onClose, summary }) => {
 
     setIsSending(true);
 
-    // Simulate email sending (in a real app, you'd integrate with an email service)
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
@@ -69,7 +68,8 @@ const EmailShare = ({ isOpen, onClose, summary }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] bg-gradient-card border-border">
+      {/* CHANGE 1: Smaller width on the main dialog content */}
+      <DialogContent className="w-full sm:max-w-sm bg-gradient-card border-border">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground">
             <Mail className="h-5 w-5 text-ai-primary" />
@@ -77,7 +77,8 @@ const EmailShare = ({ isOpen, onClose, summary }) => {
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4">
+        {/* CHANGE 2: This div wraps the form and makes it scrollable */}
+        <div className="space-y-4 pr-4 overflow-y-auto max-h-[75vh]">
           <div className="space-y-2">
             <Label className="text-sm font-medium text-foreground">Recipients</Label>
             {recipients.map((recipient, index) => (
