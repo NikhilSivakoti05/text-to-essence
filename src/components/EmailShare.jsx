@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Send, Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import emailjs from "@emailjs/browser";
 
 const EmailShare = ({ isOpen, onClose, summary }) => {
   const [recipients, setRecipients] = useState([""]);
@@ -14,16 +15,12 @@ const EmailShare = ({ isOpen, onClose, summary }) => {
   const [isSending, setIsSending] = useState(false);
   const { toast } = useToast();
 
-  const addRecipient = () => {
-    setRecipients([...recipients, ""]);
-  };
-
+  const addRecipient = () => setRecipients([...recipients, ""]);
   const removeRecipient = (index) => {
     if (recipients.length > 1) {
       setRecipients(recipients.filter((_, i) => i !== index));
     }
   };
-
   const updateRecipient = (index, value) => {
     const newRecipients = [...recipients];
     newRecipients[index] = value;
@@ -31,8 +28,7 @@ const EmailShare = ({ isOpen, onClose, summary }) => {
   };
 
   const handleSend = async () => {
-    const validRecipients = recipients.filter(email => email.trim() && email.includes('@'));
-    
+    const validRecipients = recipients.filter(email => email.trim() && email.includes("@"));
     if (validRecipients.length === 0) {
       toast({
         title: "Invalid recipients",
@@ -45,13 +41,25 @@ const EmailShare = ({ isOpen, onClose, summary }) => {
     setIsSending(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      const templateParams = {
+        to_email: validRecipients.join(", "),
+        subject,
+        message,
+        summary,
+      };
+
+      await emailjs.send(
+        "service_jj87x5k",    // Replace with your EmailJS Service ID
+        "template_uu77kpm",   // Replace with your EmailJS Template ID
+        templateParams,
+        "AHM5jzcdiTWUewMcO"   // Replace with your EmailJS Public Key
+      );
+
       toast({
         title: "Email sent successfully",
         description: `Summary shared with ${validRecipients.length} recipient(s).`,
       });
-      
+
       onClose();
       setRecipients([""]);
       setMessage("");
@@ -61,6 +69,7 @@ const EmailShare = ({ isOpen, onClose, summary }) => {
         description: "Please try again later.",
         variant: "destructive",
       });
+      console.error(error);
     } finally {
       setIsSending(false);
     }
@@ -68,17 +77,17 @@ const EmailShare = ({ isOpen, onClose, summary }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      {/* CHANGE 1: Smaller width on the main dialog content */}
-      <DialogContent className="w-full sm:max-w-sm bg-gradient-card border-border">
+      <DialogContent className="w-full sm:max-w-sm bg-gradient-card border-border max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground">
             <Mail className="h-5 w-5 text-ai-primary" />
             Share Summary via Email
           </DialogTitle>
         </DialogHeader>
-        
-        {/* CHANGE 2: This div wraps the form and makes it scrollable */}
-        <div className="space-y-4 pr-4 overflow-y-auto max-h-[75vh]">
+
+        {/* Main scrollable content */}
+        <div className="flex-1 overflow-y-auto space-y-4 pr-4">
+          {/* Recipients */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-foreground">Recipients</Label>
             {recipients.map((recipient, index) => (
@@ -113,6 +122,7 @@ const EmailShare = ({ isOpen, onClose, summary }) => {
             </Button>
           </div>
 
+          {/* Subject */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-foreground">Subject</Label>
             <Input
@@ -122,6 +132,7 @@ const EmailShare = ({ isOpen, onClose, summary }) => {
             />
           </div>
 
+          {/* Additional Message */}
           <div className="space-y-2">
             <Label className="text-sm font-medium text-foreground">Additional Message</Label>
             <Textarea
@@ -133,37 +144,31 @@ const EmailShare = ({ isOpen, onClose, summary }) => {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-foreground">Summary Preview</Label>
-            <div className="max-h-40 overflow-y-auto p-3 bg-background/30 rounded-lg border border-border">
-              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                {summary}
-              </p>
-            </div>
-          </div>
+         
+        </div>
 
-          <div className="flex gap-2 justify-end pt-4">
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSend}
-              disabled={isSending}
-              className="bg-gradient-ai hover:shadow-ai"
-            >
-              {isSending ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2" />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send className="h-4 w-4 mr-2" />
-                  Send Email
-                </>
-              )}
-            </Button>
-          </div>
+        {/* Buttons */}
+        <div className="flex gap-2 justify-end pt-4 mt-2">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSend}
+            disabled={isSending}
+            className="bg-gradient-ai hover:shadow-ai"
+          >
+            {isSending ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent mr-2" />
+                Sending...
+              </>
+            ) : (
+              <>
+                <Send className="h-4 w-4 mr-2" />
+                Send Email
+              </>
+            )}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
