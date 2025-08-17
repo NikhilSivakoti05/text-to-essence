@@ -120,7 +120,7 @@ const Index = () => {
           {/* Prompt Input Section */}
           {uploadedFile && (
             <div className="space-y-4 animate-fade-in">
-              <h2 className="text-xl font-semibold text-foreground">2. Set Your Instructions(Please wait atleast 10 seconds for response)</h2>
+              <h2 className="text-xl font-semibold text-foreground">2. Set Your Instructions(Please wait atleast 30 seconds for response )</h2>
               <div className="bg-gradient-card border border-border rounded-xl p-6">
                 <PromptInput
                   onPromptChange={setPrompt}
